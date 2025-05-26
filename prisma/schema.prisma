@@ -1,0 +1,204 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  createdAt DateTime
+  updatedAt DateTime
+
+  name          String
+  email         String    @unique
+  emailVerified Boolean
+  image         String?
+  role          UserRole  @default(USER)
+  banned        Boolean?
+  banReason     String?
+  banExpires    DateTime?
+
+  sessions Session[]
+  accounts Account[]
+  posts    Post[]
+  blogs   Blog[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  createdAt DateTime
+  updatedAt DateTime
+
+  expiresAt      DateTime
+  token          String   @unique
+  ipAddress      String?
+  userAgent      String?
+  impersonatedBy String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Account {
+  id        String   @id @default(uuid())
+  createdAt DateTime
+  updatedAt DateTime
+
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("accounts")
+}
+
+model Verification {
+  id        String    @id @default(uuid())
+  createdAt DateTime?
+  updatedAt DateTime?
+
+  identifier String
+  value      String
+  expiresAt  DateTime
+
+  @@map("verifications")
+}
+
+model Post {
+  id            String    @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title     String
+  content   String?
+  published Boolean  @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("posts")
+}
+
+
+model Address {
+  id            String    @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  salutation    String?  // Anrede
+  firstName     String   // Vorname
+  lastName      String   // Name
+  company       String?  // Firma
+  street        String   // Strasse
+  houseNumber   String   // Hausnummer
+  postalCode    String   // PLZ
+  city          String   // Ort
+  country       String   // Land
+  phone         String?  // Telefonnummer
+  email         String   // E-Mail-Adresse
+  mobile        String?  // Mobilnummer
+  keywords      String?  // Stichworte
+  searchTerms   String?  // Suchworte
+  profileImage  String?  // Profilbild
+
+  @@map("addresses")
+}
+
+model Parameter {
+  id            String    @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  key         String   @unique // Schlüssel
+  name        String?  // Name
+  password    String?  // Passwort
+  field1      String?  // Feld1
+  field2      String?  // Feld2
+  field3      String?  // Feld3
+  field4      String?  // Feld4
+  field5      String?  // Feld5
+  field6      String?  // Feld6
+  field7      String?  // Feld7
+
+  @@map("parameters")
+}
+
+model Blog {
+  id            String    @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title       String    // Titel
+  slug        String    @unique // URL-freundlicher Titel
+  content     String    // Inhalt (Markdown)
+  excerpt     String?   // Kurzbeschreibung
+  coverImage  String?   // Titelbild
+  published   Boolean   @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categories  Category[]
+  tags        Tag[]
+
+  @@map("blogs")
+}
+
+model Category {
+  id            String    @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  blogs       Blog[]
+
+  @@map("categories")
+}
+
+model Tag {
+  id            String    @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String    @unique
+  slug        String    @unique
+  blogs       Blog[]
+
+  @@map("tags")
+}
+
+
+model EmailTemplate {
+  id            String    @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String    @unique
+  subject     String
+  content     String
+  isHtml      Boolean   @default(true)
+}
+
