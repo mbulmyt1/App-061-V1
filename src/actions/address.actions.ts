@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import { addressSchema, updateAddressSchema } from '@/lib/validators/address';
 
 // Helper function for Admin Check
-export async function ensureAdmin() {
+export async function ensureUser() {
 const headersList = await headers();
 
   const session = await auth.api.getSession({
@@ -15,24 +15,39 @@ const headersList = await headers();
 
   if (!session) throw new Error("Unauthorized");
 
-  if (session.user.role !== "ADMIN") {
-    throw new Error("Forbidden");
-  }
+  // if (session.user.role !== "ADMIN") {
+  //   throw new Error("Forbidden");
+  // }
   return session;
 }
 
-// Server Action: getAddresses
+export async function ensureAdmin() {
+  const headersList = await headers();
+  
+    const session = await auth.api.getSession({
+      headers: headersList,
+    });
+  
+    if (!session) throw new Error("Unauthorized");
+  
+    if (session.user.role !== "ADMIN") {
+      throw new Error("Forbidden");
+    }
+    return session;
+  }
+  
+  // Server Action: getAddresses
 export async function getAddresses({
   searchQuery = '',
   page = 1,
-  pageSize = 10,
+  pageSize = 6,
 }: {
   searchQuery?: string;
   page?: number;
   pageSize?: number;
 } = {}) {
   try {
-    await ensureAdmin();
+    await ensureUser();
 
     const whereClause = searchQuery
       ? {
@@ -76,7 +91,7 @@ export async function getAddresses({
 // Server Action: getAddressById
 export async function getAddressById(id: string) {
   try {
-    await ensureAdmin();
+    await ensureUser();
 
     const address = await prisma.address.findUnique({
       where: { id },
@@ -118,7 +133,7 @@ export async function deleteAddress(id: string) {
 // Server Action: updateAddress
 export async function updateAddress(id: string, formData: FormData) {
   try {
-    await ensureAdmin();
+    await ensureUser();
 
     const data = Object.fromEntries(formData.entries());
     const validationResult = updateAddressSchema.safeParse(data);
@@ -149,7 +164,7 @@ export async function updateAddress(id: string, formData: FormData) {
 // Server Action: createAddress
 export async function createAddress(formData: FormData) {
   try {
-    await ensureAdmin();
+    await ensureUser();
 
     const data = Object.fromEntries(formData.entries());
     const validationResult = addressSchema.safeParse(data);

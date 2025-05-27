@@ -16,7 +16,7 @@ const mainNavItems = [
   },
   {
     title: "Addresses",
-    href: "/admin/addresses",
+    href: "/addresses",
   },
   {
     title: "Profile",
@@ -35,9 +35,6 @@ export function AppLayout({ children }: AppLayoutProps) {
     <div className="relative flex min-h-screen flex-col">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="font-bold">Better Authy</span>
-          </Link>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button
@@ -56,7 +53,10 @@ export function AppLayout({ children }: AppLayoutProps) {
               </nav>
             </SheetContent>
           </Sheet>
-        </div>
+          <Link href="/" className="mr-6 flex items-center space-x-2">
+            <span className="font-bold">Better Authy</span>
+          </Link>
+       </div>
       </header>
       <main className="flex-1">{children}</main>
     </div>

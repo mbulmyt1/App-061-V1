@@ -12,17 +12,17 @@ export default async function AdminAddressesPage() {
     redirect('/auth/login');
   }
 
-  if (session.user.role !== 'ADMIN') {
-    return (
-      <div className="px-8 py-16 container mx-auto max-w-screen-lg space-y-8">
-        <h1 className="text-2xl font-semibold">Forbidden</h1>
-        <p className="text-red-500">
-          You do not have permission to access this page.
-        </p>
-        <ReturnButton href="/admin/dashboard" label="Admin Dashboard" />
-      </div>
-    );
-  }
+  // if (session.user.role !== 'ADMIN') {
+  //   return (
+  //     <div className="px-8 py-16 container mx-auto max-w-screen-lg space-y-8">
+  //       <h1 className="text-2xl font-semibold">Forbidden</h1>
+  //       <p className="text-red-500">
+  //         You do not have permission to access this page.
+  //       </p>
+  //       <ReturnButton href="/admin/dashboard" label="Admin Dashboard" />
+  //     </div>
+  //   );
+  // }
 
   // Fetch initial data on the server
   const { data: initialAddresses, total: initialTotal, error: initialError } = await getAddresses({ page: 1, pageSize: 10 });
