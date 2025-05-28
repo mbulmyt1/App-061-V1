@@ -170,7 +170,12 @@ export default function AddressTableInteractive({
     }
   }, [initialError, initialAddresses.length, initialTotal]); // Removed handleSearch from dependencies
 
-  // The second, redundant useEffect that only handled initialError has been removed.
+  // Effect to handle initial error display
+  useEffect(() => {
+    if (initialError) {
+      toast.error(`Error loading initial addresses: ${initialError}`);
+    }
+  }, [initialError]);
 
   return (
     <div className="space-y-4">
